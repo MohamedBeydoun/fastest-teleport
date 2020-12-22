@@ -12,6 +12,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.input.MouseManager;
+import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 @Slf4j
@@ -36,17 +37,28 @@ public class FastestTeleportPlugin extends Plugin {
 	@Inject
 	private WorldMapOverlay worldMapOverlay;
 
+	@Inject
+	private FastestTeleportMapOverlay pathMapOverlay;
+
+	@Inject
+	private OverlayManager overlayManager;
+
 	private FastestTeleportMapPoint mapPointHelper;
+	public WorldPoint start = null;
+	public WorldPoint destination = null;
+	public boolean drawLine = false;
 
 	@Override
 	protected void startUp() throws Exception {
 		mouseManager.registerMouseListener(inputListener);
 		this.mapPointHelper = new FastestTeleportMapPoint(client, worldMapOverlay);
+		overlayManager.add(pathMapOverlay);
 	}
 
 	@Override
 	protected void shutDown() throws Exception {
 		mouseManager.unregisterMouseListener(inputListener);
+		overlayManager.remove(pathMapOverlay);
 	}
 
 	@Provides
@@ -85,6 +97,11 @@ public class FastestTeleportPlugin extends Plugin {
 				}
 			}
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Closest Teleport", fastestTeleport.name(), null);
+
+			// draw line on map
+			this.start = fastestTeleport.getLocation();
+			this.destination = destination;
+			drawLine = true;
 		}
 	}
 }
