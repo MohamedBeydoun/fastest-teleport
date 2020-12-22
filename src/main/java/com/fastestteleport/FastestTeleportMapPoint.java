@@ -23,12 +23,12 @@ public class FastestTeleportMapPoint {
     //	isMouseInWorldMap checks if the mouse position is inside the world map widget boundaries
     public boolean isMouseInWorldMap() {
         final Point mousePos = client.getMouseCanvasPosition();
-        final Widget view = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
-        if (view == null) {
+        final Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
+        if (map == null) {
             return false;
         }
 
-        final Rectangle worldMapBounds = view.getBounds();
+        final Rectangle worldMapBounds = map.getBounds();
 
         return worldMapBounds.contains(mousePos.getX(), mousePos.getY());
     }

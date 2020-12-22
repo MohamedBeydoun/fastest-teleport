@@ -56,15 +56,35 @@ public class FastestTeleportPlugin extends Plugin {
 
 	//	execute runs the code to find the fastest teleport to a pinged location
 	public void execute() {
+		// only execute if mouse is in the map
 		if (mapPointHelper.isMouseInWorldMap()) {
+			// find mouse position
 			final Point mousePos = client.getMouseCanvasPosition();
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Map Point", mousePos.toString(), null);
 
+			// convert mouse position to world position
 			final RenderOverview renderOverview = client.getRenderOverview();
 			final float zoom = renderOverview.getWorldMapZoom();
 			final WorldPoint destination = mapPointHelper.toWorldPoint(renderOverview, mousePos, zoom);
-
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "World Point", destination.toString(), null);
+
+			// find the fastest teleport
+			double shortestDistance = Integer.MAX_VALUE;
+			FastestTeleportLocations fastestTeleport = null;
+			for (FastestTeleportLocations location : FastestTeleportLocations.values()) {
+				int xLocation = location.getLocation().getX();
+				int yLocation = location.getLocation().getY();
+				int xDestination = destination.getX();
+				int yDestination = destination.getY();
+
+				double distance = Math.sqrt((xDestination-xLocation)*(xDestination-xLocation) + (yDestination-yLocation)*(yDestination-yLocation));
+
+				if (distance < shortestDistance) {
+					shortestDistance = distance;
+					fastestTeleport = location;
+				}
+			}
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Closest Teleport", fastestTeleport.name(), null);
 		}
 	}
 }
