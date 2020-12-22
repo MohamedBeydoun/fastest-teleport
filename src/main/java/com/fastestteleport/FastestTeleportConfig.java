@@ -1,11 +1,11 @@
-package com.example;
+package com.fastestteleport;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("example")
-public interface ExampleConfig extends Config
+@ConfigGroup("fastestteleport")
+public interface FastestTeleportConfig extends Config
 {
 	@ConfigItem(
 		keyName = "greeting",

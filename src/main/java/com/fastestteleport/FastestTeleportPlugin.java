@@ -1,4 +1,4 @@
-package com.example;
+package com.fastestteleport;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -14,40 +14,37 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Example"
+		name = "Fastest Teleport",
+		description = "Gives the fastest teleport to a pinged location on the map"
 )
-public class ExamplePlugin extends Plugin
+public class FastestTeleportPlugin extends Plugin
 {
 	@Inject
 	private Client client;
 
 	@Inject
-	private ExampleConfig config;
+	private FastestTeleportConfig config;
 
 	@Override
 	protected void startUp() throws Exception
-	{
-		log.info("Example started!");
-	}
+	{ }
 
 	@Override
 	protected void shutDown() throws Exception
-	{
-		log.info("Example stopped!");
-	}
+	{ }
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged gameStateChanged)
 	{
 		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
 		{
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.greeting(), null);
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", config.greeting() + " world!", null);
 		}
 	}
 
 	@Provides
-	ExampleConfig provideConfig(ConfigManager configManager)
+	FastestTeleportConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(ExampleConfig.class);
+		return configManager.getConfig(FastestTeleportConfig.class);
 	}
 }
