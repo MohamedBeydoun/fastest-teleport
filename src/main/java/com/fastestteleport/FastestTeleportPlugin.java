@@ -15,6 +15,11 @@ import net.runelite.client.input.MouseManager;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+
 @Slf4j
 @PluginDescriptor(
 		name = "Fastest Teleport",
@@ -44,8 +49,8 @@ public class FastestTeleportPlugin extends Plugin {
 	private OverlayManager overlayManager;
 
 	private FastestTeleportMapPoint mapPointHelper;
-	public WorldPoint start = null;
-	public WorldPoint destination = null;
+	public List<WorldPoint> starts = new ArrayList<>();
+	public List<WorldPoint> destinations = new ArrayList<>();
 	public boolean drawLine = false;
 
 	@Override
@@ -72,35 +77,42 @@ public class FastestTeleportPlugin extends Plugin {
 		if (mapPointHelper.isMouseInWorldMap()) {
 			// find mouse position
 			final Point mousePos = client.getMouseCanvasPosition();
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Map Point", mousePos.toString(), null);
 
 			// convert mouse position to world position
 			final RenderOverview renderOverview = client.getRenderOverview();
 			final float zoom = renderOverview.getWorldMapZoom();
 			final WorldPoint destination = mapPointHelper.toWorldPoint(renderOverview, mousePos, zoom);
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "World Point", destination.toString(), null);
 
-			// find the fastest teleport
-			double shortestDistance = Integer.MAX_VALUE;
-			FastestTeleportLocations fastestTeleport = null;
-			for (FastestTeleportLocations location : FastestTeleportLocations.values()) {
-				int xLocation = location.getLocation().getX();
-				int yLocation = location.getLocation().getY();
-				int xDestination = destination.getX();
-				int yDestination = destination.getY();
+			// find the fastest teleport(s)
+			starts.clear();
+			destinations.clear();
+			int closestTeleportCount = config.closestTeleportCount();
+            Set<FastestTeleportLocations> usedTeleports = new HashSet<>();
+            for (int i = 0; i < closestTeleportCount; i++) {
+				double shortestDistance = Integer.MAX_VALUE;
+				FastestTeleportLocations fastestTeleport = null;
+				for (FastestTeleportLocations location : FastestTeleportLocations.values()) {
+				    if (usedTeleports.contains(location)) continue;
 
-				double distance = Math.sqrt((xDestination-xLocation)*(xDestination-xLocation) + (yDestination-yLocation)*(yDestination-yLocation));
+					int xLocation = location.getLocation().getX();
+					int yLocation = location.getLocation().getY();
+					int xDestination = destination.getX();
+					int yDestination = destination.getY();
 
-				if (distance < shortestDistance) {
-					shortestDistance = distance;
-					fastestTeleport = location;
+					double distance = Math.sqrt((xDestination-xLocation)*(xDestination-xLocation) + (yDestination-yLocation)*(yDestination-yLocation));
+
+					if (distance < shortestDistance) {
+						shortestDistance = distance;
+						fastestTeleport = location;
+						usedTeleports.add(location);
+					}
 				}
-			}
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Closest Teleport", fastestTeleport.name(), null);
 
-			// draw line on map
-			this.start = fastestTeleport.getLocation();
-			this.destination = destination;
+				// draw line on map
+				this.starts.add(fastestTeleport.getLocation());
+				this.destinations.add(destination);
+			}
+
 			drawLine = true;
 		}
 	}

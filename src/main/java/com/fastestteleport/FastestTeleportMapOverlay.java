@@ -11,6 +11,8 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class FastestTeleportMapOverlay extends Overlay {
 
@@ -20,12 +22,16 @@ public class FastestTeleportMapOverlay extends Overlay {
     private final Client client;
     private final FastestTeleportPlugin plugin;
     private final FastestTeleportConfig config;
+    private final List<Color> colors = new ArrayList<>();
 
     @Inject
     private FastestTeleportMapOverlay(Client client, FastestTeleportPlugin plugin, FastestTeleportConfig config) {
         this.client = client;
         this.plugin = plugin;
         this.config = config;
+        this.colors.add(new Color(0, 255, 0, 150));
+        this.colors.add(new Color(255, 255, 0, 150));
+        this.colors.add(new Color(255, 0, 0, 150));
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(OverlayPriority.LOW);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
@@ -38,11 +44,13 @@ public class FastestTeleportMapOverlay extends Overlay {
         }
 
         if (plugin.drawLine) {
-            graphics.setColor(new Color(255, 0, 0, 150));
-            graphics.setStroke(new BasicStroke(5));
-            Point start = worldMapOverlay.mapWorldPointToGraphicsPoint(plugin.start);
-            Point end = worldMapOverlay.mapWorldPointToGraphicsPoint(plugin.destination);
-            graphics.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+            for (int i = 0; i < plugin.starts.size(); i++) {
+                graphics.setColor(this.colors.get(i));
+                graphics.setStroke(new BasicStroke(5));
+                Point start = worldMapOverlay.mapWorldPointToGraphicsPoint(plugin.starts.get(i));
+                Point end = worldMapOverlay.mapWorldPointToGraphicsPoint(plugin.destinations.get(i));
+                graphics.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+            }
         }
 
         return null;

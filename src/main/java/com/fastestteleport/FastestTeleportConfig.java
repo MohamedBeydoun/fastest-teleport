@@ -2,18 +2,23 @@ package com.fastestteleport;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Range;
 
 @ConfigGroup("fastestteleport")
 public interface FastestTeleportConfig extends Config
 {
-	@ConfigItem(
-		keyName = "greeting",
-		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
+	@Range(
+			min = 1,
+			max = 3
 	)
-	default String greeting()
-	{
-		return "Hello";
+	@ConfigItem(
+			keyName = "closestTeleportCount",
+			name = "Closest Teleport Count",
+			description = "How many nearby teleports will be shown on the map?"
+	)
+	default int closestTeleportCount() {
+		return 1;
 	}
 }
